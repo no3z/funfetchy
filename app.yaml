@@ -1,0 +1,22 @@
+application: funfetchy
+version: 1
+runtime: python
+api_version: 1
+
+
+handlers:
+- url: /media
+  static_dir: media
+
+
+- url: /(rss|album|list|new|upload.*)
+  script: image_sharing.py
+  login: required
+
+- url: /.*
+  script: funfetchy.py
+  
+- url: /stylesheets
+  static_dir: stylesheets
+
+

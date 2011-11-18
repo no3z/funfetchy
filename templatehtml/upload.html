@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}redfunfetch internal updater.{% endblock %}
+{% block content %}
+{% for s in subs %}
+<div class='preview'>
+  <div class='title'>{{s.title}}</div>
+</div>
+{% endfor %}
+<a href='/'>GOTO MAIN</a><br>
+{% endblock %}
