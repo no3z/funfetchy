@@ -53,7 +53,7 @@ class FfSlideshow(FfBaseHandler):
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
-        self.response.headers['Content-Type'] = 'image/png'
+        self.response.headers['Content-Type'] = 'image/gif'
         self.response.out.write(image.data)
 
 
@@ -61,6 +61,11 @@ class FfUpdate(webapp.RequestHandler):
     def get(self):
         page_json = urlfetch.Fetch("http://www.reddit.com/r/wtf.json" )
         obj = json.loads(  page_json.content )
+
+        s = db.Query(RedditSubmissions)
+        s = RedditSubmissions.all()
+
+
 
         print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
@@ -75,14 +80,12 @@ class FfUpdate(webapp.RequestHandler):
             if not ext:
               continue
 
-            image = urlfetch.Fetch(subs['data']['url']).content
-            
-            img = images.Image(image)
-            img.im_feeling_lucky()
-
-            png_data = img.execute_transforms(images.PNG)
-
             try:
+                image = urlfetch.Fetch(subs['data']['url']).content
+                img = images.Image(image)
+                img.im_feeling_lucky()
+                png_data = img.execute_transforms(images.PNG)
+                
                 RedditSubmissions(
                     data= png_data,
                     json = str(subs['data']),
