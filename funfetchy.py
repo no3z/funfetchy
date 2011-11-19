@@ -59,16 +59,9 @@ class FfServeImage(webapp.RequestHandler):
 
 class FfUpdate(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('<html><body>')
-        self.response.out.write('<form action="/update" method="POST" enctype="multipart/form-data">')
-        self.response.out.write('''Upload File: <input type="file" name="file"><br> <input type="submit"
-         name="submit" value="Submit"> </form></body></html>''')
-
-
-    def post(self):
         page_json = urlfetch.Fetch("http://www.reddit.com/r/wtf.json" )
         obj = json.loads(  page_json.content )
-        #obj = json.loads(  urlfetch.Fetch("../media/funny.json" ).content )
+
         print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children')[:5]:
             print subs['data']['title'], subs['data']
