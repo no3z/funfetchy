@@ -9,10 +9,6 @@ handlers:
   static_dir: media
 
 
-- url: /(rss|album|list|new|upload.*)
-  script: image_sharing.py
-  login: required
-
 - url: /.*
   script: funfetchy.py
   

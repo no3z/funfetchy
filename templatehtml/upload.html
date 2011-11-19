@@ -1,10 +1,7 @@
 {% extends "base.html" %}
-{% block title %}redfunfetch internal updater.{% endblock %}
+{% block title %}Uploading new photo{% endblock %}
 {% block content %}
-{% for s in subs %}
-<div class='preview'>
-  <div class='title'>{{s.title}}</div>
-</div>
-{% endfor %}
-<a href='/'>GOTO MAIN</a><br>
+<form action='/update' method='post'>
+  <div><input type='submit' value='Import Feed!'></a></div>
+</form>
 {% endblock %}

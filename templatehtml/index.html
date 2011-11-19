@@ -4,6 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="shortcut icon" href="media/favicon.ico" />
     <title>funfetchy</title>
 </head>
 
@@ -12,7 +13,7 @@
 <div id="container">
     <div id="slide">
         {% for s in subs %}
-        <a class="slide"><img src="/media/{{ s.key }}" alt="{{ s.title }}"</img> </a>
+        <a class="slide"><img src='image/{{ s.key }}'></img></a>
         {% endfor %}
     </div>
 </div>

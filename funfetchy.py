@@ -1,3 +1,6 @@
+from __future__ import with_statement
+from google.appengine.api import files
+
 import os
 
 from google.appengine.dist import use_library
@@ -9,8 +12,10 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 from django.utils import simplejson as json
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 
-
+import urllib
 import wsgiref.handlers
 import random
 import urlparse
@@ -25,7 +30,6 @@ class RedditSubmissions(db.Model):
   score = db.IntegerProperty()
   rand = db.FloatProperty()
 
-
 class FfBaseHandler(webapp.RequestHandler):
   def template_path(self, filename):
     return os.path.join(os.path.dirname(__file__), filename)
@@ -37,7 +41,6 @@ class FfBaseHandler(webapp.RequestHandler):
 
 
 class FfSlideshow(FfBaseHandler):
-
   def get(self):
     submissions = db.Query(RedditSubmissions)
     submissions = RedditSubmissions.all()
@@ -48,45 +51,59 @@ class FfSlideshow(FfBaseHandler):
 
 
 class FfServeImage(webapp.RequestHandler):
-  def get(self, pic_key):
-    image = db.get(pic_key)
-    self.response.headers['Content-Type'] = 'image/png'
-    self.response.out.write(image.data)
+    def get(self,pic_key):
+        image = db.get(pic_key)
+        self.response.headers['Content-Type'] = 'image/png'
+        self.response.out.write(image.data)
 
 
-class FfUpdate(FfBaseHandler):
+class FfUpdate(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write('<html><body>')
+        self.response.out.write('<form action="/update" method="POST" enctype="multipart/form-data">')
+        self.response.out.write('''Upload File: <input type="file" name="file"><br> <input type="submit"
+         name="submit" value="Submit"> </form></body></html>''')
 
-  def get(self):
-    obj = json.loads(  urlfetch.Fetch("http://www.reddit.com/r/funny.json" ).content)
-    print dir(obj.get('data'))
 
+    def post(self):
+        page_json = urlfetch.Fetch("http://www.reddit.com/r/wtf.json" )
+        obj = json.loads(  page_json.content )
+        #obj = json.loads(  urlfetch.Fetch("../media/funny.json" ).content )
+        print(obj.get('data').get('children'))
+        for subs in  obj.get('data').get('children')[:5]:
+            print subs['data']['title'], subs['data']
 
-    for subs in  obj.get('data').get('children'):
-      print subs['data']['title'], subs['data']
-     
-      path = urlparse.urlparse(subs['data']['url']).path
-      ext = os.path.splitext(path)[1]
+            if not subs['data']['url']:
+              continue
 
-      if not ext:
-          continue
-          
-      image = urlfetch.Fetch(subs['data']['url']).content
-      img = images.Image(image)
-      img.im_feeling_lucky()
-      png_data = db.Blob(img.execute_transforms(images.PNG))
-      try:
-        RedditSubmissions(
-            data=db.Blob(png_data),
-            json=str(subs['json']),
-            title = subs['data']['title'],
-            url = subs['data']['url'],
-            author = subs['data']['author'],
-            score = subs['data']['score'],
-            rand = random.random()
-            ).put()
+            path = urlparse.urlparse(subs['data']['url']).path
+            ext = os.path.splitext(path)[1]
 
-      except Exception,e:
-            print e
+            if not ext:
+              continue
+
+            image = urlfetch.Fetch(subs['data']['url']).content
+            
+            img = images.Image(image)
+            img.im_feeling_lucky()
+
+            png_data = img.execute_transforms(images.PNG)
+
+            try:
+                RedditSubmissions(
+                    data= png_data,
+                    json = str(subs['data']),
+                    title = subs['data']['title'],
+                    url =subs['data']['url'],
+                    author = subs['data']['author'],
+                    score = int(subs['data']['score']),
+                    rand = random.random(),
+                    ).put()
+
+                print "put"
+
+            except Exception,e:
+                print e
 
     sub = db.Query(RedditSubmissions)
     sub = RedditSubmissions.all()
@@ -96,7 +113,7 @@ class FfUpdate(FfBaseHandler):
 
 def main():
   url_map = [('/update', FfUpdate),
-             ('/media/([-\w]+)', FfServeImage),
+             ('/image/([-\w]+)', FfServeImage),
              ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)
