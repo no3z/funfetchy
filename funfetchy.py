@@ -8,18 +8,21 @@ from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
+from django.utils import simplejson as json
+
 
 import wsgiref.handlers
 import random
-import reddit
-
+import urlparse
 
 class RedditSubmissions(db.Model):
   created_date = db.DateTimeProperty(auto_now_add=True)
+  json = db.TextProperty()
   data = db.BlobProperty()
   title = db.StringProperty()
   url = db.StringProperty()
   author = db.StringProperty()
+  score = db.IntegerProperty()
   rand = db.FloatProperty()
 
 
@@ -38,39 +41,52 @@ class FfSlideshow(FfBaseHandler):
   def get(self):
     submissions = db.Query(RedditSubmissions)
     submissions = RedditSubmissions.all()
-        
+    
     self.render_to_response('templatehtml/index.html', {
         'subs': submissions,
      })
 
 
+class FfServeImage(webapp.RequestHandler):
+  def get(self, pic_key):
+    image = db.get(pic_key)
+    self.response.headers['Content-Type'] = 'image/png'
+    self.response.out.write(image.data)
+
+
 class FfUpdate(FfBaseHandler):
 
   def get(self):
-    r = reddit.Reddit(user_agent="redfunfetcher2")
-    l = list(r.get_subreddit("funny").get_top(limit=20))
+    obj = json.loads(  urlfetch.Fetch("http://www.reddit.com/r/funny.json" ).content)
+    print dir(obj.get('data'))
 
- 
-    for s in l:
-        if int(str(s.url).find(".jpg")) > 0:
-            print s,s.title,s.url
 
-            image = urlfetch.Fetch(str(s.url)).content
+    for subs in  obj.get('data').get('children'):
+      print subs['data']['title'], subs['data']
+     
+      path = urlparse.urlparse(subs['data']['url']).path
+      ext = os.path.splitext(path)[1]
 
-            jpg = db.Blob(images.execute_transforms(image.JPEG))
+      if not ext:
+          continue
+          
+      image = urlfetch.Fetch(subs['data']['url']).content
+      img = images.Image(image)
+      img.im_feeling_lucky()
+      png_data = db.Blob(img.execute_transforms(images.PNG))
+      try:
+        RedditSubmissions(
+            data=db.Blob(png_data),
+            json=str(subs['json']),
+            title = subs['data']['title'],
+            url = subs['data']['url'],
+            author = subs['data']['author'],
+            score = subs['data']['score'],
+            rand = random.random()
+            ).put()
 
-            try:
-                RedditSubmissions(
-                data = jpg,
-                title = s.title,
-                url = s.url,
-                author = s.author.user_name,
-                rand = random.random()).put()
-
-            except Exception,e:
-                print e
-                self.response.out.write('Sorry, the image provided was too large for us to process.')
-                continue
+      except Exception,e:
+            print e
 
     sub = db.Query(RedditSubmissions)
     sub = RedditSubmissions.all()
@@ -80,6 +96,7 @@ class FfUpdate(FfBaseHandler):
 
 def main():
   url_map = [('/update', FfUpdate),
+             ('/media/([-\w]+)', FfServeImage),
              ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)

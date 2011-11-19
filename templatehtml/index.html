@@ -1,17 +1,61 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>funfetchy</title>
-<body>
-    {% if subs %}
-    {% for s in subs %}
-        {{ s.title }}
-    {% endfor %}
-    {% endif %}
+<html xmlns="http://www.w3.org/1999/xhtml">
 
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>funfetchy</title>
+</head>
+
+{% if subs %}
+<body>
+<div id="container">
+    <div id="slide">
+        {% for s in subs %}
+        <a class="slide"><img src="/media/{{ s.key }}" alt="{{ s.title }}"</img> </a>
+        {% endfor %}
+    </div>
+</div>
+
+<p id="slide1_controls">
+    <style>
+	p#slide1_controls {
+		text-align:center;
+	}
+	#slide1_controls span {
+		padding-right:2em;
+		cursor:pointer;
+	}
+	#slide1_container {
+		width:450px;
+		height:281px;
+		overflow:hidden;
+		position:relative;
+		margin:0 auto;
+	}
+	#slide1_images {
+		position:absolute;
+		left:0px;
+		width:1800px;
+		-webkit-transition:all 1.0s ease-in-out;
+		-moz-transition:all 1.0s ease-in-out;
+		-o-transition:all 1.0s ease-in-out;
+		-ms-transition:all 1.0s ease-in-out;
+		transition:all 1.0s ease-in-out;
+	}
+	#slide1_images img {
+		padding:0;
+		margin:0;
+		float:left;
+	}
+</style>
+    {% for s in subs %}
+        <span id="slide-{{ forloop.counter }}">{{ s.title }}</span>
+    {% endfor %}
+</p>
 
 </body>
+{% endif %}
 </html>
 
 
