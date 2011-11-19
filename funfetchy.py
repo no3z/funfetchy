@@ -63,7 +63,7 @@ class FfUpdate(webapp.RequestHandler):
         obj = json.loads(  page_json.content )
 
         print(obj.get('data').get('children'))
-        for subs in  obj.get('data').get('children')[:5]:
+        for subs in  obj.get('data').get('children'):
             print subs['data']['title'], subs['data']
 
             if not subs['data']['url']:
