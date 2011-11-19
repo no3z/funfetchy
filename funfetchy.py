@@ -12,10 +12,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 from django.utils import simplejson as json
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
 
-import urllib
+
 import wsgiref.handlers
 import random
 import urlparse
@@ -62,13 +60,15 @@ class FfUpdate(webapp.RequestHandler):
         page_json = urlfetch.Fetch("http://www.reddit.com/r/wtf.json" )
         obj = json.loads(  page_json.content )
 
+        #DELETE ALL PREVIOUS POSTS
         s = db.Query(RedditSubmissions)
-        s = RedditSubmissions.all()
-
-
+        s = RedditSubmissions.all();
+        for j in s:
+            j.delete()
 
         print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
+
             print subs['data']['title'], subs['data']
 
             if not subs['data']['url']:
@@ -85,7 +85,7 @@ class FfUpdate(webapp.RequestHandler):
                 img = images.Image(image)
                 img.im_feeling_lucky()
                 png_data = img.execute_transforms(images.PNG)
-                
+
                 RedditSubmissions(
                     data= png_data,
                     json = str(subs['data']),
@@ -101,8 +101,7 @@ class FfUpdate(webapp.RequestHandler):
             except Exception,e:
                 print e
 
-    sub = db.Query(RedditSubmissions)
-    sub = RedditSubmissions.all()
+        self.redirect('/')
     
     #self.render_to_response('templatehtml/upload.html', {'subs': sub })
 
