@@ -57,7 +57,7 @@ class FfServeImage(webapp.RequestHandler):
 
 class FfUpdate(webapp.RequestHandler):
     def get(self):
-        page_json = urlfetch.Fetch("http://www.reddit.com/r/wtf.json" )
+        page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
         obj = json.loads(  page_json.content )
 
         #DELETE ALL PREVIOUS POSTS
@@ -77,7 +77,7 @@ class FfUpdate(webapp.RequestHandler):
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
-            if not ext:
+            if not ext or ext == "gif":
               continue
 
             try:

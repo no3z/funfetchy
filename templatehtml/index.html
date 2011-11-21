@@ -3,55 +3,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <link href='http://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="shortcut icon" href="media/favicon.ico" />
-
-    <style>
-        body{
-            font-family: 'Chivo', sans-serif;
-            font-size: 32px;
-            color:white;
-            text-shadow: 3px 3px 7px #444444;
-            background-color: #000000;
-        }
-        a {
-            border-bottom-width:1;
-            border-left-width:1;
-            border-right-width:1;
-            margin:1;
-            padding:1;
-        }
-    </style>
-
+    <link rel="stylesheet" type="text/css" href="media/styles.css" />
+    <link href='http://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
     <title>funfetchy</title>
 </head>
 
-{% if subs %}
-<body>
-    <form id="form1" runat="server">
-        <div id="nav">
-            <table align="center">
-                <tr>
-                    <td colspan ="1" align="center"></td>
-                    <td align="center">
-                    {% for s in subs %}
 
-                    <ul align="center"><a id="subs"  alt="{{ s.title }}">
-                        <br></br><br></br>
-                        {{ s.title }}
-                        <br></br>    
-                        <img src='image/{{ s.key }}'></img>
-                    </a></ul>
-                    {% endfor %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </form>
-
+<body align="center">
+  <canvas id="text" width="600" height="100"></canvas>
+  <div id="slideshow">
+    <ul class="slides">
+      {% if subs %}
+      {% for s in subs %}
+      <li><img src='image/{{ s.key }}' alt="{{ s.title }}" author="{{ s.author }}" /></li>
+      {% endfor %}
+      {% endif %}
+    </ul>
+    <span class="arrow previous"></span>
+    <span class="arrow next"></span>
+</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script src="media/script.js"></script>
 </body>
-{% endif %}
 </html>
 
 
