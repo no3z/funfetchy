@@ -29,7 +29,7 @@ body{
 	list-style:none outside none;
 	overflow:hidden;
 	position:absolute;
-	align:center;
+
 	width:100%;
 	left:40px;
 	top:40px;
@@ -75,6 +75,13 @@ body{
 
 
 /* The following styles are only used for the styling of the demo page */
+p.text{
+            font-family: 'Chivo', sans-serif;
+            font-size: 32px;
+            color:white;
+            text-shadow: 3px 3px 7px #444444;
+            background-color: #000000;
+        }
 
 p.tzine{
 	text-align:center;

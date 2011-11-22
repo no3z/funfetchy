@@ -1,34 +1,97 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <link rel="shortcut icon" href="media/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="media/styles.css" />
-    <link href='http://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <title>funfetchy</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>redditFunFetcher</title>
+	<link href="media/style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="media/swipeview.js"></script>
 </head>
 
+<body>
+	<div id="wrapper"></div>
+	<ul id="nav">
+		<li id="prev" onclick="gallery.prev()">-</li>
+		{% if subs %}
+		<li class="selected" onclick="gallery.goToPage(0)"></li>
+		{% for s in subs %}
+		<li onclick="gallery.goToPage({{ forloop.counter }})"></li>
+		{% endfor %}
+		<li id="next" onclick="gallery.next()">+</li>
+		{% endif %}
+	</ul>
+	
+<script type="text/javascript">
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 
-<body align="center">
-  <canvas id="text" width="600" height="100"></canvas>
-  <div id="slideshow">
-    <ul class="slides">
-      {% if subs %}
-      {% for s in subs %}
-      <li><img src='image/{{ s.key }}' alt="{{ s.title }}" author="{{ s.author }}" /></li>
-      {% endfor %}
-      {% endif %}
-    </ul>
-    <span class="arrow previous"></span>
-    <span class="arrow next"></span>
-</div>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script src="media/script.js"></script>
+var	gallery,
+	el,
+	i,
+	page,
+	dots = document.querySelectorAll('#nav li'),
+	slides = [
+
+{% for s in subs %}
+		{
+			img: 'image/{{ s.key }}',
+			desc: '{{ s.title }}'
+		},
+{% endfor %}
+	];
+
+gallery = new SwipeView('#wrapper', { numberOfPages: slides.length });
+
+// Load initial data
+for (i=0; i<3; i++) {
+	page = i==0 ? slides.length-1 : i-1;
+	el = document.createElement('img');
+	el.className = 'loading';
+	el.src = slides[page].img;
+	el.width = slides[page].width;
+	el.height = slides[page].height;
+	el.onload = function () { this.className = ''; }
+	gallery.masterPages[i].appendChild(el);
+
+	el = document.createElement('span');
+	el.innerHTML = slides[page].desc;
+	gallery.masterPages[i].appendChild(el)
+}
+
+gallery.onFlip(function () {
+	var el,
+		upcoming,
+		i;
+
+	for (i=0; i<3; i++) {
+		upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
+
+		if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
+			el = gallery.masterPages[i].querySelector('img');
+			el.className = 'loading';
+			el.src = slides[upcoming].img;
+			el.width = 640; //slides[upcoming].width;
+			el.height = 480; //slides[upcoming].height;
+			
+			el = gallery.masterPages[i].querySelector('span');
+			el.innerHTML = slides[upcoming].desc;
+		}
+	}
+	
+	document.querySelector('#nav .selected').className = '';
+	dots[gallery.pageIndex+1].className = 'selected';
+});
+
+gallery.onMoveOut(function () {
+	gallery.masterPages[gallery.currentMasterPage].className = gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+});
+
+gallery.onMoveIn(function () {
+	var className = gallery.masterPages[gallery.currentMasterPage].className;
+	/(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
+});
+
+</script>
 </body>
 </html>
-
-
-
-

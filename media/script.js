@@ -5,8 +5,9 @@ $(window).load(function(){
 
 
 	// Testing wether the current browser supports the canvas element:
+      
 	var supportCanvas = 'getContext' in document.createElement('canvas');
-
+      
 	// The canvas manipulations of the images are CPU intensive,
 	// this is why we are using setTimeout to make them asynchronous
 	// and improve the responsiveness of the page.
@@ -30,6 +31,7 @@ $(window).load(function(){
 				
 				// Rendering the modified versions of the images:
 				createCanvasOverlay(this);
+
 			});
 		}
 		
@@ -102,7 +104,7 @@ $(window).load(function(){
 
 		// Taking the image data and storing it in the imageData array:
 		var imageData	= canvasContext.getImageData(0,0,canvas.width,canvas.height),
-			data		= imageData.data;
+		    data		= imageData.data;
 		
 		// Loop through all the pixels in the imageData array, and modify
 		// the red, green, and blue color values.
