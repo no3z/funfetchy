@@ -22,6 +22,8 @@ class RedditSubmissions(db.Model):
   created_date = db.DateTimeProperty(auto_now_add=True)
   json = db.TextProperty()
   data = db.BlobProperty()
+  width = db.IntegerProperty()
+  height = db.IntegerProperty()
   title = db.StringProperty()
   url = db.StringProperty()
   author = db.StringProperty()
@@ -77,7 +79,8 @@ class FfUpdate(webapp.RequestHandler):
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
-            if not ext or ext == "gif":
+            print ext
+            if not ext or ext == ".gif":
               continue
 
             try:
@@ -85,11 +88,15 @@ class FfUpdate(webapp.RequestHandler):
                 img = images.Image(image)
                 img.im_feeling_lucky()
                 png_data = img.execute_transforms(images.PNG)
-
+                
+                temp = subs['data']['title']
+                temp = temp.replace("\"", "\'")
                 RedditSubmissions(
                     data= png_data,
+                    width = img.width,
+                    height = img.height,
                     json = str(subs['data']),
-                    title = subs['data']['title'],
+                    title = temp,
                     url =subs['data']['url'],
                     author = subs['data']['author'],
                     score = int(subs['data']['score']),

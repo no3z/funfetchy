@@ -2,9 +2,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=8.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 	<title>redditFunFetcher</title>
 	<link href="media/style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="media/swipeview.js"></script>
@@ -14,29 +16,24 @@
 	<div id="wrapper"></div>
 	<ul id="nav">
 		<li id="prev" onclick="gallery.prev()">-</li>
-		{% if subs %}
-		<li class="selected" onclick="gallery.goToPage(0)"></li>
-		{% for s in subs %}
-		<li onclick="gallery.goToPage({{ forloop.counter }})"></li>
-		{% endfor %}
 		<li id="next" onclick="gallery.next()">+</li>
-		{% endif %}
 	</ul>
 	
 <script type="text/javascript">
-document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
 
 var	gallery,
 	el,
 	i,
 	page,
-	dots = document.querySelectorAll('#nav li'),
 	slides = [
 
 {% for s in subs %}
 		{
-			img: 'image/{{ s.key }}',
-			desc: '{{ s.title }}'
+			img: "image/{{ s.key }}",
+                        width: {{ s.width }},
+                        height: {{ s.height }},
+			desc: "{{ s.title }}"
 		},
 {% endfor %}
 	];
@@ -49,8 +46,8 @@ for (i=0; i<3; i++) {
 	el = document.createElement('img');
 	el.className = 'loading';
 	el.src = slides[page].img;
-	el.width = slides[page].width;
-	el.height = slides[page].height;
+	el.width = slides[page].width / 2;
+	el.height = slides[page].height / 2;
 	el.onload = function () { this.className = ''; }
 	gallery.masterPages[i].appendChild(el);
 
@@ -71,8 +68,8 @@ gallery.onFlip(function () {
 			el = gallery.masterPages[i].querySelector('img');
 			el.className = 'loading';
 			el.src = slides[upcoming].img;
-			el.width = 640; //slides[upcoming].width;
-			el.height = 480; //slides[upcoming].height;
+			el.width = slides[upcoming].width / 2;
+			el.height = slides[upcoming].height / 2;
 			
 			el = gallery.masterPages[i].querySelector('span');
 			el.innerHTML = slides[upcoming].desc;
@@ -80,7 +77,6 @@ gallery.onFlip(function () {
 	}
 	
 	document.querySelector('#nav .selected').className = '';
-	dots[gallery.pageIndex+1].className = 'selected';
 });
 
 gallery.onMoveOut(function () {

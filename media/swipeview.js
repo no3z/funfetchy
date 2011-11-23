@@ -27,7 +27,7 @@ var SwipeView = (function(){
 			// User defined options
 			for (i in options) this.options[i] = options[i];
 			
-			this.wrapper.style.overflow = 'hidden';
+			this.wrapper.style.overflow = 'scroll';
 			this.wrapper.style.position = 'relative';
 			
 			this.masterPages = [];
@@ -43,7 +43,7 @@ var SwipeView = (function(){
 			for (i=-1; i<2; i++) {
 				div = document.createElement('div');
 				div.id = 'swipeview-masterpage-' + (i+1);
-				div.style.cssText = '-webkit-transform:translateZ(0);position:absolute;top:0;height:100%;width:100%;left:' + i*100 + '%';
+				div.style.cssText = '-webkit-transform:translateZ(0);position:relative;top:0;height:100%;width:100%;left:' + i*100 + '%';
 				if (!div.dataset) div.dataset = {};
 				pageIndex = i == -1 ? this.options.numberOfPages - 1 : i;
 				div.dataset.pageIndex = pageIndex;
