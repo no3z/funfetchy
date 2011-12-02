@@ -56,17 +56,19 @@ class FfServeImage(webapp.RequestHandler):
         self.response.headers['Content-Type'] = 'image/gif'
         self.response.out.write(image.data)
 
-
-class FfUpdate(webapp.RequestHandler):
-    def get(self):
-        page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
-        obj = json.loads(  page_json.content )
-
+class FfDelete(webapp.RequestHandler):
+  def get(self):
         #DELETE ALL PREVIOUS POSTS
         s = db.Query(RedditSubmissions)
         s = RedditSubmissions.all();
         for j in s:
             j.delete()
+
+
+class FfUpdate(webapp.RequestHandler):
+    def get(self):
+        page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
+        obj = json.loads(  page_json.content )
 
         print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
@@ -75,18 +77,27 @@ class FfUpdate(webapp.RequestHandler):
 
             if not subs['data']['url']:
               continue
-
+            
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
             print ext
-            if not ext or ext == ".gif":
+            if not ext and ext != ".gif":
               continue
 
             try:
                 image = urlfetch.Fetch(subs['data']['url']).content
                 img = images.Image(image)
                 img.im_feeling_lucky()
+
+                if img.width > 2048 or img.height > 1600:
+                  continue
+                  
+                if img.width > 1024 or img.height > 768:
+                  img.resize(1024,768)
+
+                png_data = img
+                
                 png_data = img.execute_transforms(images.PNG)
                 
                 temp = subs['data']['title']
@@ -115,6 +126,7 @@ class FfUpdate(webapp.RequestHandler):
 
 def main():
   url_map = [('/update', FfUpdate),
+             ('/delete', FfDelete),
              ('/image/([-\w]+)', FfServeImage),
              ('/', FfSlideshow)]
              

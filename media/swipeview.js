@@ -43,7 +43,7 @@ var SwipeView = (function(){
 			for (i=-1; i<2; i++) {
 				div = document.createElement('div');
 				div.id = 'swipeview-masterpage-' + (i+1);
-				div.style.cssText = '-webkit-transform:translateZ(0);position:relative;top:0;height:100%;width:100%;left:' + i*100 + '%';
+				div.style.cssText = '-webkit-transform:translateZ(0);position:absolute;top:0;height:100%;width:100%;left:' + i*100 + '%';
 				if (!div.dataset) div.dataset = {};
 				pageIndex = i == -1 ? this.options.numberOfPages - 1 : i;
 				div.dataset.pageIndex = pageIndex;
@@ -120,7 +120,7 @@ var SwipeView = (function(){
 			this.pageWidth = this.wrapperWidth;
 			this.maxX = -2 * this.pageWidth + this.wrapperWidth;
 			this.snapThreshold = this.options.snapThreshold === null
-				? Math.round(this.pageWidth * .15)
+				? Math.round(this.pageWidth * .005)
 				: /%/.test(this.options.snapThreshold)
 					? Math.round(this.pageWidth * this.options.snapThreshold.replace('%', '') / 100)
 					: this.options.snapThreshold;

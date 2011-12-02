@@ -14,10 +14,6 @@
 
 <body>
 	<div id="wrapper"></div>
-	<ul id="nav">
-		<li id="prev" onclick="gallery.prev()">-</li>
-		<li id="next" onclick="gallery.next()">+</li>
-	</ul>
 	
 <script type="text/javascript">
 
@@ -46,8 +42,11 @@ for (i=0; i<3; i++) {
 	el = document.createElement('img');
 	el.className = 'loading';
 	el.src = slides[page].img;
-	el.width = slides[page].width / 2;
-	el.height = slides[page].height / 2;
+	el.width =  slides[page].width * (gallery.wrapperWidth / slides[page].width / 
+	       ( 1024 / slides[page].width ) );
+	el.height = slides[page].height * (gallery.wrapperHeight /  slides[page].height / 
+	       ( 768 / slides[page].height )) ;
+
 	el.onload = function () { this.className = ''; }
 	gallery.masterPages[i].appendChild(el);
 
@@ -65,18 +64,22 @@ gallery.onFlip(function () {
 		upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
 
 		if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
-			el = gallery.masterPages[i].querySelector('img');
-			el.className = 'loading';
-			el.src = slides[upcoming].img;
-			el.width = slides[upcoming].width / 2;
-			el.height = slides[upcoming].height / 2;
+		       el = gallery.masterPages[i].querySelector('img');
+		       el.className = 'loading';
+		       el.src = slides[upcoming].img;
+		       
+		       
+
+		       el.width =  slides[upcoming].width * ( gallery.wrapperWidth /  slides[upcoming].width) / 
+		       (1024 / slides[upcoming].width) ;
+			el.height = slides[upcoming].height * (  gallery.wrapperHeight /  slides[upcoming].height ) / 
+		       (768 /  slides[upcoming].height);
 			
 			el = gallery.masterPages[i].querySelector('span');
 			el.innerHTML = slides[upcoming].desc;
 		}
 	}
 	
-	document.querySelector('#nav .selected').className = '';
 });
 
 gallery.onMoveOut(function () {
