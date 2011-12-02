@@ -70,32 +70,37 @@ class FfUpdate(webapp.RequestHandler):
         page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
         obj = json.loads(  page_json.content )
 
-        print(obj.get('data').get('children'))
+       # print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
-          try:
-            print subs['data']['title'], subs['data']
-
             if not subs['data']['url']:
               continue
             
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
-          except:
-            continue
-        
             print ext
             if not ext and ext != ".gif":
               continue
 
             try:
+                #print subs['data']['title'], subs['data']
                 image = urlfetch.Fetch(subs['data']['url']).content
                 img = images.Image(image)
                 img.im_feeling_lucky()
 
                 if img.width > 2048 or img.height > 1600:
                   continue
+
+                tt = subs['data']['title'];
+                s = db.Query(RedditSubmissions)
+                s = RedditSubmissions.all();
+                r = s.filter('title =', tt).fetch(limit=1)
+                print tt
+                if r[0]:
+                  print "not add"
+                  continue
                   
+                
                 if img.width > 1024 or img.height > 768:
                   img.resize(1024,768)
 
