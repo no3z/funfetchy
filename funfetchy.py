@@ -72,7 +72,7 @@ class FfUpdate(webapp.RequestHandler):
 
         print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
-
+          try:
             print subs['data']['title'], subs['data']
 
             if not subs['data']['url']:
@@ -81,6 +81,9 @@ class FfUpdate(webapp.RequestHandler):
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
+          except:
+            continue
+        
             print ext
             if not ext and ext != ".gif":
               continue
