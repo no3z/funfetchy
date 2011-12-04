@@ -1,0 +1,11 @@
+redfunfetch -
+
+App running @ http://funfetchy.appspot.com
+
+Python Google app engine experiment. 
+Get the json at http://reddit.com/r/funny and extract images and titles from it. 
+Display images using swipeview.
+Only tested on iphone hardware.
+
+SwipeView javascript taken from https://github.com/cubiq/SwipeView by Matteo Spinelli
+add2home javascript taken from https://github.com/cubiq/add-to-homescreen by Matteo Spinelli
