@@ -24,7 +24,7 @@
 				lifespan:100000,				// The popup lives 10 seconds
 				expire:2,					// The popup is shown only once every 2 minutes
 				touchIcon:true,
-			    message:'I\'m your <strong>%device</strong>. CLICKME `%icon` to install'
+			    message:'I\'m your <strong>%device</strong>, to install this neat app go to `%icon`.'
 			};
 
 			document.write('<link rel="stylesheet" href="media//add2home.css">');
@@ -32,7 +32,7 @@
 		}
 	</script>
 
-	<title>redditFunFetcher</title>
+	<title>redfunfetchit</title>
 	<link href="media/style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="media/swipeview.js"></script>
 </head>
@@ -75,7 +75,7 @@ for (i=0; i<3; i++) {
 	el.height =  window.innerHeight * wratio;
     }else{
 	el.width =  window.innerWidth * hratio;
-	el.height =  window.innerHeight - 80;
+	el.height =  window.innerHeight - 100;
     }
     
     el.onload = function () { this.className = ''; }
@@ -106,7 +106,7 @@ gallery.onFlip(function () {
 		el.height =  window.innerHeight * wratio;
 	    }else{
 		el.width =  window.innerWidth * hratio;
-		el.height =  window.innerHeight - 80;
+		el.height =  window.innerHeight - 100;
 	    }
     
 	    el = gallery.masterPages[i].querySelector('span');
