@@ -32,7 +32,7 @@
 		}
 	</script>
 
-	<title>redfunfetchit</title>
+	<title>redfunfetch</title>
 	<link href="media/style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="media/swipeview.js"></script>
 </head>
@@ -71,13 +71,14 @@ for (i=0; i<3; i++) {
     hratio = slides[page].width/slides[page].height;
     wratio = slides[page].height/slides[page].width;
     if(hratio > wratio){
-	el.width =  window.innerWidth - 80;
-	el.height =  window.innerHeight * wratio;
+	el.width =  window.innerWidth - 20;
+	if(wratio > 1.0)wratio=1;
+	el.height =  (window.innerHeight * wratio) - 100;
     }else{
-	el.width =  window.innerWidth * hratio;
+	if(hratio > 1.0)hratio=1;
+	el.width =  (window.innerWidth * hratio) - 20;
 	el.height =  window.innerHeight - 100;
     }
-    
     el.onload = function () { this.className = ''; }
     gallery.masterPages[i].appendChild(el);
     
@@ -102,10 +103,12 @@ gallery.onFlip(function () {
 	    hratio = slides[upcoming].width/slides[upcoming].height;
 	    wratio = slides[upcoming].height/slides[upcoming].width;
 	    if(hratio > wratio){
-		el.width =  window.innerWidth - 80;
-		el.height =  window.innerHeight * wratio;
+		el.width =  window.innerWidth - 20;
+		if(wratio > 1.0)wratio=1;
+		el.height =  (window.innerHeight * wratio) - 100;
 	    }else{
-		el.width =  window.innerWidth * hratio;
+		if(hratio > 1.0)hratio=1;
+		el.width =  (window.innerWidth * hratio) - 20;
 		el.height =  window.innerHeight - 100;
 	    }
     

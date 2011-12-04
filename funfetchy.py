@@ -82,6 +82,10 @@ class FfUpdate(webapp.RequestHandler):
             if not ext and ext != ".gif":
               continue
 
+            title = subs['data']['title']
+            if "NFSW" in title or "reddit" in title:
+              print title, "Discarded"
+              
             tt = subs['data']['url'];
             s = db.Query(RedditSubmissions)
             s = RedditSubmissions.all();

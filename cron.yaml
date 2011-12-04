@@ -4,4 +4,4 @@ cron:
   schedule: every 24 hours
 - description: update summary job
   url: /update
-  schedule: every 3 hours
+  schedule: every 1 hours
