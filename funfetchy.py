@@ -82,55 +82,55 @@ class FfUpdate(webapp.RequestHandler):
             if not ext and ext != ".gif":
               continue
 
+            tt = subs['data']['url'];
+            s = db.Query(RedditSubmissions)
+            s = RedditSubmissions.all();
+            r = s.filter('url =', tt).fetch(limit=1)
+            print tt, len(r)
+            if len(r) > 0:
+              print "Not added: ", tt
+              print "\n"
+              continue
+            
             try:
-                #print subs['data']['title'], subs['data']
-                image = urlfetch.Fetch(subs['data']['url']).content
-                img = images.Image(image)
-                img.im_feeling_lucky()
-
-                if img.width > 2048 or img.height > 1600:
-                  continue
-
-                tt = subs['data']['title'];
-                s = db.Query(RedditSubmissions)
-                s = RedditSubmissions.all();
-                r = s.filter('title =', tt).fetch(limit=1)
-                print tt
-                if r[0]:
-                  print "not add"
-                  continue
-                  
+              image = urlfetch.Fetch(subs['data']['url']).content
+              img = images.Image(image)
+              img.im_feeling_lucky()
+              
+              if img.width > 2048 or img.height > 1600:
+                continue
+              
                 
-                if img.width > 1024 or img.height > 768:
-                  img.resize(1024,768)
-
-                png_data = img
+              if img.width > 1024 or img.height > 768:
+                img.resize(1024,768)
                 
-                png_data = img.execute_transforms(images.PNG)
+              png_data = img
                 
-                temp = subs['data']['title']
-                temp = temp.replace("\"", "\'")
-                RedditSubmissions(
-                    data= png_data,
-                    width = img.width,
-                    height = img.height,
-                    json = str(subs['data']),
-                    title = temp,
-                    url =subs['data']['url'],
-                    author = subs['data']['author'],
-                    score = int(subs['data']['score']),
-                    rand = random.random(),
+              png_data = img.execute_transforms(images.PNG)
+                
+              temp = subs['data']['title']
+              temp = temp.replace("\"", "\'")
+              RedditSubmissions(
+                data= png_data,
+                width = img.width,
+                height = img.height,
+                json = str(subs['data']),
+                title = temp,
+                  url =subs['data']['url'],
+                author = subs['data']['author'],
+                score = int(subs['data']['score']),
+                rand = random.random(),
                     ).put()
-
-                print "put"
-
+              
+              print "put"
+              
             except Exception,e:
-                print e
-
-        self.redirect('/')
-    
+              print e
+              
+            self.redirect('/')
+                
     #self.render_to_response('templatehtml/upload.html', {'subs': sub })
-
+    
 
 def main():
   url_map = [('/update', FfUpdate),

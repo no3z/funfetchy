@@ -43,18 +43,20 @@ for (i=0; i<3; i++) {
     el.className = 'loading';
     el.src = slides[page].img;
     
-    if (slides[page].height > slides[page].width) {
+    if (slides[page].height < slides[page].width) {
+	hratio = slides[page].width/slides[page].height;
+	height = (window.innerWidth / hratio);
+	el.width =  window.innerWidth-30;
+	el.height = height; //window.innerHeight;
+    }
+    else{
+
 	wratio = slides[page].height/slides[page].width;
 	width = (window.innerHeight / wratio);
 	el.width =  width; 
 	el.height = window.innerHeight - 80;
 
-    }
-    else{
-	hratio = slides[page].width/slides[page].height;
-	height = (window.innerWidth / hratio);
-	el.width =  window.innerWidth-30;
-	el.height = height; //window.innerHeight;
+
     }
             
     el.onload = function () { this.className = ''; }
@@ -78,20 +80,21 @@ gallery.onFlip(function () {
 	    el.className = 'loading';
 	    el.src = slides[upcoming].img;
 	    
-	    if (slides[upcoming].height > slides[upcoming].width) {
+	    if (slides[upcoming].height < slides[upcoming].width) {
+	hratio = slides[upcoming].width/slides[upcoming].height;
+		height = (window.innerWidth / hratio);
+		el.width =  window.innerWidth - 30;
+		el.height = height; //window.innerHeight;
+	
+	    }
+	    else{
 
 		wratio = slides[upcoming].height/slides[upcoming].width;
 		width = (window.innerHeight / wratio);
 		el.width =  width; 
 		el.height = window.innerHeight - 80;
-
-	    }
-	    else{
-		hratio = slides[upcoming].width/slides[upcoming].height;
-		height = (window.innerWidth / hratio);
-		el.width =  window.innerWidth - 30;
-		el.height = height; //window.innerHeight;
-	    }
+	
+    }
 		    
 	    el = gallery.masterPages[i].querySelector('span');
 	    el.innerHTML = slides[upcoming].desc;
