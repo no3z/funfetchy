@@ -20,7 +20,7 @@ var SwipeView = (function(){
 			this.options = {
 				text: null,
 				numberOfPages: 3,
-			    snapThreshold: 90.0,
+			    snapThreshold: null,
 				hastyPageFlip: false
 			}
 		
@@ -120,7 +120,7 @@ var SwipeView = (function(){
 			this.pageWidth = this.wrapperWidth;
 			this.maxX = -2 * this.pageWidth + this.wrapperWidth;
 			this.snapThreshold = this.options.snapThreshold === null
-				? Math.round(this.pageWidth * .15)
+				? Math.round(this.pageWidth * .0015)
 				: /%/.test(this.options.snapThreshold)
 					? Math.round(this.pageWidth * this.options.snapThreshold.replace('%', '') / 100)
 					: this.options.snapThreshold;

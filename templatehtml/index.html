@@ -7,6 +7,31 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+
+	<!-- Of course it is advisable to have touch icons ready for each device -->
+	<link rel="apple-touch-icon" href="media/touch-icon-iphone.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="media/touch-icon-ipad.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="media/touch-icon-iphone4.png">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<script type="text/javascript">
+		if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
+			var addToHomeConfig = {
+				animationIn:'bubble',		// Animation In
+				animationOut:'drop',		// Animation Out
+				lifespan:100000,				// The popup lives 10 seconds
+				expire:2,					// The popup is shown only once every 2 minutes
+				touchIcon:true,
+			    message:'I\'m your <strong>%device</strong>. CLICKME `%icon` to install'
+			};
+
+			document.write('<link rel="stylesheet" href="media//add2home.css">');
+			document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');
+		}
+	</script>
+
 	<title>redditFunFetcher</title>
 	<link href="media/style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="media/swipeview.js"></script>
