@@ -44,11 +44,19 @@ class FfSlideshow(FfBaseHandler):
   def get(self):
     submissions = db.Query(RedditSubmissions)
     submissions = RedditSubmissions.all()
-    
+    submissions.order('-created_date')
     self.render_to_response('templatehtml/index.html', {
         'subs': submissions,
      })
 
+class FfPass(FfBaseHandler):
+  def get(self):
+    submissions = db.Query(RedditSubmissions)
+    submissions = RedditSubmissions.all()
+    submissions.order('-created_date')
+    self.render_to_response('templatehtml/webgl.html', {
+        'subs': submissions,
+     })
 
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
@@ -139,6 +147,7 @@ class FfUpdate(webapp.RequestHandler):
 def main():
   url_map = [('/update', FfUpdate),
              ('/delete', FfDelete),
+             ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
              ('/', FfSlideshow)]
              
