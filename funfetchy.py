@@ -29,6 +29,7 @@ class RedditSubmissions(db.Model):
   author = db.StringProperty()
   score = db.IntegerProperty()
   rand = db.FloatProperty()
+  star = db.BooleanProperty()
 
 class FfBaseHandler(webapp.RequestHandler):
   def template_path(self, filename):
@@ -56,8 +57,27 @@ class FfPass(FfBaseHandler):
     submissions.order('-created_date')
     self.render_to_response('templatehtml/webgl.html', {
         'subs': submissions,
+        'size': submissions.count(),
+        'one': submissions[0]
      })
 
+class FfBest(FfBaseHandler):
+  def get(self):
+    submissions = db.Query(RedditSubmissions)
+    submissions = RedditSubmissions.all().filter('star =',True)
+    submissions.order('-created_date')
+    self.render_to_response('templatehtml/index.html', {
+        'subs': submissions,
+     })
+
+class FfUpVote(FfBaseHandler):
+    def post(self,pic_key):
+        sub = db.get(pic_key)
+        sub.star = True
+        sub.put()
+        
+        self.redirect('/webgl')
+        
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
@@ -70,6 +90,7 @@ class FfDelete(webapp.RequestHandler):
         s = db.Query(RedditSubmissions)
         s = RedditSubmissions.all();
         for j in s:
+          if not j.star:
             j.delete()
 
 
@@ -147,8 +168,10 @@ class FfUpdate(webapp.RequestHandler):
 def main():
   url_map = [('/update', FfUpdate),
              ('/delete', FfDelete),
+             ('/best', FfBest),
              ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
+             ('/upvote/([-\w]+)', FfUpVote),
              ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)

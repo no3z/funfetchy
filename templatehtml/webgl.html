@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - texture filtering</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #aaa;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+			.lbl { color:#fff; font-size:20px; font-weight:bold; position: absolute; bottom:0%; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+			#lbl_left { text-align:center; width:100%; margin:auto;   display:table; }
+
+			.g { color:#aaa }
+			.c { color:#fa0 }
+
+			a { color:red }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://funfetchy.appspot.com/webgl" target="_blank">webgl - redfunfetch - editor</a> - by <a href="http://no3z.com">no3z.com</a>
+		</div>
+
+    <div id="lbl_left" class="lbl">    Floor    
+		</div>
+
+		<script src="media/Three.js"></script>
+		<script src="media/Tween.js"></script>
+
+		<script src="media/Detector.js"></script>
+		<script src="media/RequestAnimationFrame.js"></script>
+		<script src="media/Stats.js"></script>
+
+    <script>
+    
+    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+    
+    var SCREEN_WIDTH = window.innerWidth;
+    var SCREEN_HEIGHT = window.innerHeight;
+    
+    var container,stats;
+    
+    var camera, scene, renderer;
+    
+    var mouseX = 0, mouseY = 0;
+    
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+    var mesh;
+    var meshCanvas;
+    var size = {{ size }};
+
+    var current = 0;
+    var mesh;
+    var slides = [
+	{% for s in subs %}{
+	    number: {{ forloop.counter0 }},
+	    img: "{{ s.key }}",
+	    width: {{ s.width }},
+	    height: {{ s.height }},
+	    desc: "{{ s.title }}",
+	    star: "{{ s.star }}"
+	},
+	{% endfor %}
+    ];
+    
+
+	init();
+	animate();
+	
+	function init() {
+	    container = document.createElement( 'div' );
+	    document.body.appendChild( container );
+	    
+	    camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
+	    camera.position.z = 1500;
+	    
+	    scene = new THREE.Scene();
+	    
+	    scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+	    
+	    // GROUND
+	    
+	    var imageCanvas = document.createElement( "canvas" ),
+		context = imageCanvas.getContext( "2d" );
+	    
+	    imageCanvas.width = imageCanvas.height = 128;
+	    
+	    context.fillStyle = "#444";
+	    context.fillRect( 0, 0, 128, 128 );
+	    
+	    context.fillStyle = "#fff";
+	    context.fillRect( 0, 0, 64, 64);
+	    context.fillRect( 64, 64, 64, 64 );
+	    
+	    var textureCanvas = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+	    materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+	    
+	    textureCanvas.needsUpdate = true;
+	    textureCanvas.repeat.set( 1000, 1000 );
+	    
+	    
+	    var geometry = new THREE.PlaneGeometry( 100, 100 );
+	    
+	    meshCanvas = new THREE.Mesh( geometry, materialCanvas );
+	    meshCanvas.rotation.x = Math.PI / 2;
+	    meshCanvas.scale.set( 1000, 1000, 1000 );
+	    meshCanvas.doubleSided = true;
+	    var floorHeight = - 1.117 * 576/2;
+	    meshCanvas.position.y = floorHeight;
+	    scene.add( meshCanvas );
+
+	    materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+	    
+	    
+    // PAINTING
+    var callbackPainting = function( image ) {
+	var geometry = new THREE.PlaneGeometry( 100, 100 );
+	mesh = new THREE.Mesh( geometry, materialPainting );
+	addPainting( scene, mesh );
+	function addPainting( zscene, zmesh ) {
+	    zmesh.scale.x = image.width / 100;
+	    zmesh.scale.y = image.height / 100;
+	    zscene.add( zmesh );
+	    var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
+	    meshFrame.scale.x = 1.1 * image.width / 100;
+	    meshFrame.scale.y = 1.1 * image.height / 100;
+	    zscene.add( meshFrame );
+	    var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
+	    meshShadow.position.z = - 1.1 * image.height/2;
+	    meshShadow.scale.x = 1.1 * image.width / 100;
+	    meshShadow.scale.y = 1.1 * image.height / 100;
+	    meshShadow.rotation.x = -Math.PI / 2;
+	    zscene.add( meshShadow );
+	    meshShadow.position.y = - 1.1 * image.height/2;
+	    var floorHeight = - 1.117 * image.height/2;
+	    meshCanvas.position.y = floorHeight;
+	}
+	
+	el = document.getElementById('lbl_left');
+	el.innerHTML = slides[current].desc + ' </br> <span id="res" class="g">('+slides[current].width+','+slides[current].height+')</span>    <span id="star" class="c">'+slides[current].star+'</span>'
+
+
+	addPainting( scene, mesh );
+	};
+	
+	
+	
+	var texturePainting = THREE.ImageUtils.loadTexture( "image/" + slides[current].img , THREE.UVMapping, callbackPainting );
+	materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } ),
+	texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
+	
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+	renderer.setClearColor( scene.fog.color, 1 );
+	renderer.autoClear = false;
+
+	renderer.domElement.style.position = "relative";
+	container.appendChild( renderer.domElement );
+
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.top = '0px';
+	stats.domElement.style.zIndex = 100;
+	//container.appendChild( stats.domElement );
+
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+	document.addEventListener( 'keydown', onDocumentKeyDown, false );
+
+	    TWEEN.start();
+
+    }
+
+    function changeTextureToSubmission(old,num){
+	var texturePainting = THREE.ImageUtils.loadTexture( "image/" + slides[num].img , THREE.UVMapping);
+	mesh.material.map = texturePainting;
+	el = document.getElementById('lbl_left');
+
+	el.innerHTML = slides[current].desc + ' </br> <span id="res" class="g">('+slides[current].width+','+slides[current].height+')</span>    <span id="star" class="c">'+slides[current].star+'</span>'
+
+	
+	var wo = slides[old].width/100;
+	var ho = slides[old].height/100;
+	var wn = slides[num].width/100;
+	var hn = slides[num].height/100;
+	var floorHeight = - 1.117 * slides[num].height/2;
+
+	var tween_floor = new TWEEN.Tween(meshCanvas.position).to({y: floorHeight},1000);
+	var tween = new TWEEN.Tween(mesh.scale).to({x: wn, y: hn},1000);
+	tween.start();
+	tween_floor.start();
+
+
+    }
+
+    function onDocumentMouseMove(event) {
+
+	mouseX = ( event.clientX - windowHalfX );
+	mouseY = ( event.clientY - windowHalfY );
+
+    }
+
+    function upVote(){
+	document.body.innerHTML += '<form id="dynForm" action="/upvote/'+ slides[current].img +'" method="post" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
+	document.getElementById("dynForm").submit();
+    }
+
+    function onDocumentKeyDown(event) {
+	var keyCode = event.keyCode;
+	if( keyCode == 37){ 
+	    var o = current;
+	    if(current > 0){
+		current -= 1;
+	    }
+	    else{
+		current = size-1;
+	    }
+	    changeTextureToSubmission(o,current);
+	}
+	else if( keyCode == 39 ){
+	    var o = current;
+	    if(current < size-1){
+		current += 1;
+	    }
+	    else{
+		current = 0;
+	    }
+	    changeTextureToSubmission(o,current);
+	}
+	else if(keyCode == 38){
+	    upVote();
+	}
+	else if ( keyCode == 8 ) {
+	    event.preventDefault();
+	    return false;
+	}
+
+    }
+
+
+    function animate() {
+
+	requestAnimationFrame( animate );
+
+	render();
+	stats.update();
+
+    }
+
+    function render() {
+
+	camera.position.x += ( mouseX - camera.position.x ) * .05;
+	camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+
+	camera.lookAt( scene.position );
+
+	
+	renderer.clear();
+	
+	renderer.render( scene, camera );
+
+
+    }
+
+    </script>
+
+    </body>
+
+</html>
+
