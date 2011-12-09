@@ -121,14 +121,15 @@ class FfUpdate(webapp.RequestHandler):
               continue
 
             title = subs['data']['title']
-            if "NFSW" in title or "reddit" in title:
+            if title.find("NSFW") > 0:
               print title, "Discarded"
-              
+              continue
+            
             tt = subs['data']['url'];
             s = db.Query(RedditSubmissions)
             s = RedditSubmissions.all();
             r = s.filter('url =', tt).fetch(limit=1)
-            print tt, len(r)
+            print title, tt, len(r)
             if len(r) > 0:
               print "Not added: ", tt
               print "\n"
@@ -178,12 +179,12 @@ class FfUpdate(webapp.RequestHandler):
 def main():
   url_map = [
              ('/delete', FfDelete),
-             ('/best', FfBest),
+             ('/best', FfSlideshow),
              ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
              ('/upvote/([-\w]+)', FfUpVote),
              ('/update/([-\w]+)', FfUpdate),
-             ('/', FfSlideshow)]
+             ('/', FfBest)]
              
   application = webapp.WSGIApplication(url_map,debug=True)
   wsgiref.handlers.CGIHandler().run(application)

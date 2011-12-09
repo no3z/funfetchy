@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - texture filtering</title>
+		<title>redfunfetch - editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -36,7 +36,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://funfetchy.appspot.com/webgl" target="_blank">webgl - redfunfetch - editor</a> - by <a href="http://no3z.com">no3z.com</a>
+			<a href="http://funfetchy.appspot.com/webgl" target="_blank">webgl - redfunfetch - three.js - editor</a> - by <a href="http://no3z.com">no3z.com</a>
 		</div>
 
     <div id="lbl_left" class="lbl">    Floor    
@@ -65,6 +65,7 @@
     var windowHalfX = window.innerWidth / 2;
     var windowHalfY = window.innerHeight / 2;
     var mesh;
+    var meshFrame;
     var meshCanvas;
     var size = {{ size }};
 
@@ -135,21 +136,18 @@
     var callbackPainting = function( image ) {
 	var geometry = new THREE.PlaneGeometry( 100, 100 );
 	mesh = new THREE.Mesh( geometry, materialPainting );
-	addPainting( scene, mesh );
-	function addPainting( zscene, zmesh ) {
+	meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
+
+	addPainting( scene, mesh , meshFrame);
+	function addPainting( zscene, zmesh , fmeshFrame) {
 	    zmesh.scale.x = image.width / 100;
 	    zmesh.scale.y = image.height / 100;
 	    zscene.add( zmesh );
-	    var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
-	    meshFrame.scale.x = 1.1 * image.width / 100;
-	    meshFrame.scale.y = 1.1 * image.height / 100;
-	    zscene.add( meshFrame );
-	    var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
-	    meshShadow.position.z = - 1.1 * image.height/2;
-	    meshShadow.scale.x = 1.1 * image.width / 100;
-	    meshShadow.scale.y = 1.1 * image.height / 100;
-	    meshShadow.rotation.x = -Math.PI / 2;
-	    zscene.add( meshShadow );
+	   
+	    fmeshFrame.scale.x = 1.1 * image.width / 100;
+	    fmeshFrame.scale.y = 1.1 * image.height / 100;
+	    zscene.add( fmeshFrame );
+
 	    meshShadow.position.y = - 1.1 * image.height/2;
 	    var floorHeight = - 1.117 * image.height/2;
 	    meshCanvas.position.y = floorHeight;
@@ -197,10 +195,12 @@
 	var wn = slides[num].width/100;
 	var hn = slides[num].height/100;
 	var floorHeight = - 1.117 * slides[num].height/2;
-
+	    
+	var tween_frame = new TWEEN.Tween(meshFrame.scale).to({x: 1.1 * wn, y: 1.1 * hn},1000);
 	var tween_floor = new TWEEN.Tween(meshCanvas.position).to({y: floorHeight},1000);
 	var tween = new TWEEN.Tween(mesh.scale).to({x: wn, y: hn},1000);
 	tween.start();
+	tween_frame.start()
 	tween_floor.start();
 
 
