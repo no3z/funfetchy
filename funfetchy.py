@@ -44,7 +44,7 @@ class FfBaseHandler(webapp.RequestHandler):
 class FfSlideshow(FfBaseHandler):
   def get(self):
     submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all()
+    submissions = RedditSubmissions.all().filter('star =',True)
     submissions.order('-created_date')
     self.render_to_response('templatehtml/index.html', {
         'subs': submissions,
@@ -61,26 +61,33 @@ class FfPass(FfBaseHandler):
         'one': submissions[0]
      })
 
-class FfBest(FfBaseHandler):
+class FfNew(FfBaseHandler):
   def get(self):
     submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all().filter('star =',True)
+    submissions = RedditSubmissions.all()
     submissions.order('-created_date')
-    self.render_to_response('templatehtml/index.html', {
+    self.render_to_response('templatehtml/new.html', {
         'subs': submissions,
      })
 
-class FfUpVote(FfBaseHandler):
+class FfUpVote2(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
-
         if not sub.star:
           sub.star = True
         else:
           sub.star = False
-          
         sub.put()
-        
+        self.redirect('/new')
+     
+class FfUpVote(FfBaseHandler):
+    def post(self,pic_key):
+        sub = db.get(pic_key)
+        if not sub.star:
+          sub.star = True
+        else:
+          sub.star = False
+        sub.put()
         self.redirect('/webgl')
         
 class FfServeImage(webapp.RequestHandler):
@@ -179,12 +186,13 @@ class FfUpdate(webapp.RequestHandler):
 def main():
   url_map = [
              ('/delete', FfDelete),
-             ('/best', FfSlideshow),
+             ('/new', FfNew),
              ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
              ('/upvote/([-\w]+)', FfUpVote),
+             ('/upvote2/([-\w]+)', FfUpVote2),
              ('/update/([-\w]+)', FfUpdate),
-             ('/', FfBest)]
+             ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)
   wsgiref.handlers.CGIHandler().run(application)

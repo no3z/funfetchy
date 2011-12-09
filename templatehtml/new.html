@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1, minimum-scale=1.0, maximum-scale=8.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
+	<!-- Of course it is advisable to have touch icons ready for each device -->
+	<link rel="apple-touch-icon" href="media/touch-icon-iphone.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="media/touch-icon-ipad.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="media/touch-icon-iphone4.png">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<style>
+	  .lbl { color:#fff; font-size:12px; font-weight:bold; position: absolute; top:0%; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+	  #lbl_left { text-align:center; width:0%; margin:auto;   display:table; }
+	  .g { color:#aaa }
+	  .c { color:#fa0 }
+	   a { color:red }
+	  
+	</style>
+
+	<script type="text/javascript">
+		if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
+			var addToHomeConfig = {
+				animationIn:'bubble',		// Animation In
+				animationOut:'drop',		// Animation Out
+				lifespan:100000,				// The popup lives 10 seconds
+				expire:5,					// The popup is shown only once every 2 minutes
+				touchIcon:true,
+			    message:'<strong>%device</strong> says: you can add this app to your homescreen.'
+			};
+
+			document.write('<link rel="stylesheet" href="media//add2home.css">');
+			document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');
+		}
+	</script>
+
+	<title>redfunfetch</title>
+	<link href="media/style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="media/swipeview.js"></script>
+</head>
+
+<body>
+	<div id="wrapper">
+  <div id="lbl_left" class="lbl">  redfunfetch   
+	</div>
+		<ul id="nav">
+		  <li id="next" onclick="upVote()">+</li>
+	</ul>
+
+<script type="text/javascript">
+
+function upVote(){
+
+	document.body.innerHTML += '<form id="dynForm" action="/upvote2/'+ slides[current].key +'" method="post" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
+	document.getElementById("dynForm").submit();
+alert("added");
+}
+
+var	gallery,
+	el,
+	i,
+	page,
+        current,
+	slides = [
+
+{% for s in subs %}
+		{
+			img: "image/{{ s.key }}",
+			key: "{{ s.key }}",
+                        width: {{ s.width }},
+                        height: {{ s.height }},
+			desc: "{{ s.title }}",
+                        star: "{{s.star}}"
+		},
+{% endfor %}
+	];
+
+gallery = new SwipeView('#wrapper', { numberOfPages: slides.length });
+
+current = 0;
+
+// Load initial data
+for (i=0; i<3; i++) {
+    page = i==0 ? slides.length-1 : i-1;
+    el = document.createElement('img');
+    el.className = 'loading';
+    el.src = slides[page].img;
+    
+    hratio = slides[page].width/slides[page].height;
+    wratio = slides[page].height/slides[page].width;
+    if(hratio > wratio){
+	el.width =  window.innerWidth - 20;
+	if(wratio > 1.0)wratio=1;
+	el.height =  (window.innerHeight * wratio) - 100;
+    }else{
+	if(hratio > 1.0)hratio=1;
+	el.width =  (window.innerWidth * hratio) - 20;
+	el.height =  window.innerHeight - 100;
+    }
+    el.onload = function () { this.className = ''; }
+    gallery.masterPages[i].appendChild(el);
+    
+    el = document.createElement('span');
+    el.innerHTML = slides[page].desc;
+    gallery.masterPages[i].appendChild(el)
+}
+
+gallery.onFlip(function () {
+    var el,
+	upcoming,
+	i;
+    
+    for (i=0; i<3; i++) {
+	upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
+	
+	if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
+	    el = gallery.masterPages[i].querySelector('img');
+	    el.className = 'loading';
+	    el.src = slides[upcoming].img;
+	    	 	    
+	    hratio = slides[upcoming].width/slides[upcoming].height;
+	    wratio = slides[upcoming].height/slides[upcoming].width;
+	    if(hratio > wratio){
+		el.width =  window.innerWidth - 20;
+		if(wratio > 1.0)wratio=1;
+		el.height =  (window.innerHeight * wratio) - 100;
+	    }else{
+		if(hratio > 1.0)hratio=1;
+		el.width =  (window.innerWidth * hratio) - 20;
+		el.height =  window.innerHeight - 100;
+	    }
+    
+	    el = gallery.masterPages[i].querySelector('span');
+	    el.innerHTML = slides[upcoming].desc;
+		}
+	}
+      current = gallery.pageIndex;
+      el = document.getElementById('lbl_left');
+
+      el.innerHTML =  ' <span id="res" class="g">('+slides[current].width+','+slides[current].height+')</span>    <span id="star" class="c">'+slides[current].star+'</span> <span id="star" class="g">'+current+'</span>'
+
+});
+
+gallery.onMoveOut(function () {
+	gallery.masterPages[gallery.currentMasterPage].className = gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+});
+
+gallery.onMoveIn(function () {
+	var className = gallery.masterPages[gallery.currentMasterPage].className;
+	/(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
+});
+
+</script>
+</body>
+</html>
