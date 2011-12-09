@@ -73,7 +73,12 @@ class FfBest(FfBaseHandler):
 class FfUpVote(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
-        sub.star = True
+
+        if not sub.star:
+          sub.star = True
+        else:
+          sub.star = False
+          
         sub.put()
         
         self.redirect('/webgl')
@@ -95,11 +100,15 @@ class FfDelete(webapp.RequestHandler):
 
 
 class FfUpdate(webapp.RequestHandler):
-    def get(self):
-        page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
+    def get(self,page):
+        
+        page_json = urlfetch.Fetch('http://www.reddit.com/r/'+page+'.json' )
+
+        print page,page_json.content
+        
         obj = json.loads(  page_json.content )
 
-       # print(obj.get('data').get('children'))
+        #print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
             if not subs['data']['url']:
               continue
@@ -108,7 +117,7 @@ class FfUpdate(webapp.RequestHandler):
             ext = os.path.splitext(path)[1]
 
             print ext
-            if not ext and ext != ".gif":
+            if not ext or ext == ".gif":
               continue
 
             title = subs['data']['title']
@@ -153,6 +162,7 @@ class FfUpdate(webapp.RequestHandler):
                 author = subs['data']['author'],
                 score = int(subs['data']['score']),
                 rand = random.random(),
+                star = False,
                     ).put()
               
               print "put"
@@ -166,12 +176,13 @@ class FfUpdate(webapp.RequestHandler):
     
 
 def main():
-  url_map = [('/update', FfUpdate),
+  url_map = [
              ('/delete', FfDelete),
              ('/best', FfBest),
              ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
              ('/upvote/([-\w]+)', FfUpVote),
+             ('/update/([-\w]+)', FfUpdate),
              ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)
