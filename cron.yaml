@@ -3,5 +3,5 @@ cron:
   url: /delete
   schedule: every 24 hours
 - description: update summary job
-  url: /update
+  url: /update/funny
   schedule: every 1 hours
