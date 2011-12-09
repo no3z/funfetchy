@@ -176,12 +176,6 @@
 	renderer.domElement.style.position = "relative";
 	container.appendChild( renderer.domElement );
 
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	stats.domElement.style.zIndex = 100;
-	//container.appendChild( stats.domElement );
-
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 	document.addEventListener( 'keydown', onDocumentKeyDown, false );
@@ -260,10 +254,7 @@
     function animate() {
 
 	requestAnimationFrame( animate );
-
 	render();
-	stats.update();
-
     }
 
     function render() {
