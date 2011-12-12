@@ -1,11 +1,14 @@
-redfunfetch -
+redfunfetch - reddit funny submissions fetcher (and displayer) iphone / webGL interfaces
 
-App running @ http://funfetchy.appspot.com
+iphone App running @ http://funfetchy.appspot.com
+webgl App running @ http://funfetchy.appspot.com/webgl
 
-Python Google app engine experiment. 
-Get the json at http://reddit.com/r/funny and extract images and titles from it. 
-Display images using swipeview.
-Only tested on iphone hardware.
+Google app engine application that fetches the json data at http://reddit.com/r/funny and stores the images and 
+information on the database. 
+
+On iphone devices it displays the images and titles with a nice touch swipeview functionality.
+On webgl enabled browser it will also let the user star the submissions.
 
 SwipeView javascript taken from https://github.com/cubiq/SwipeView by Matteo Spinelli
 add2home javascript taken from https://github.com/cubiq/add-to-homescreen by Matteo Spinelli
+three.js & Tween.js from mr.doob at https://github.com/mrdoob/three.js/
