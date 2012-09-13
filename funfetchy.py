@@ -22,11 +22,14 @@ class RedditSubmissions(db.Model):
   created_date = db.DateTimeProperty(auto_now_add=True)
   json = db.TextProperty()
   data = db.BlobProperty()
+  width = db.IntegerProperty()
+  height = db.IntegerProperty()
   title = db.StringProperty()
   url = db.StringProperty()
   author = db.StringProperty()
   score = db.IntegerProperty()
   rand = db.FloatProperty()
+  star = db.BooleanProperty()
 
 class FfBaseHandler(webapp.RequestHandler):
   def template_path(self, filename):
@@ -41,74 +44,154 @@ class FfBaseHandler(webapp.RequestHandler):
 class FfSlideshow(FfBaseHandler):
   def get(self):
     submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all()
-    
+    submissions = RedditSubmissions.all().filter('star =',True)
+    submissions.order('-created_date')
     self.render_to_response('templatehtml/index.html', {
         'subs': submissions,
      })
 
+class FfPass(FfBaseHandler):
+  def get(self):
+    submissions = db.Query(RedditSubmissions)
+    submissions = RedditSubmissions.all()
+    submissions.order('-created_date')
+    self.render_to_response('templatehtml/webgl.html', {
+        'subs': submissions,
+        'size': submissions.count(),
+        'one': submissions[0]
+     })
 
+class FfNew(FfBaseHandler):
+  def get(self):
+    submissions = db.Query(RedditSubmissions)
+    submissions = RedditSubmissions.all()
+    submissions.order('-created_date')
+    self.render_to_response('templatehtml/new.html', {
+        'subs': submissions,
+     })
+
+class FfUpVote2(FfBaseHandler):
+    def post(self,pic_key):
+        sub = db.get(pic_key)
+        if not sub.star:
+          sub.star = True
+        else:
+          sub.star = False
+        sub.put()
+        self.redirect('/new')
+     
+class FfUpVote(FfBaseHandler):
+    def post(self,pic_key):
+        sub = db.get(pic_key)
+        if not sub.star:
+          sub.star = True
+        else:
+          sub.star = False
+        sub.put()
+        self.redirect('/webgl')
+        
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
         self.response.headers['Content-Type'] = 'image/gif'
         self.response.out.write(image.data)
 
-
-class FfUpdate(webapp.RequestHandler):
-    def get(self):
-        page_json = urlfetch.Fetch("http://www.reddit.com/r/funny.json" )
-        obj = json.loads(  page_json.content )
-
+class FfDelete(webapp.RequestHandler):
+  def get(self):
         #DELETE ALL PREVIOUS POSTS
         s = db.Query(RedditSubmissions)
         s = RedditSubmissions.all();
         for j in s:
+          if not j.star:
             j.delete()
 
-        print(obj.get('data').get('children'))
+
+class FfUpdate(webapp.RequestHandler):
+    def get(self,page):
+        
+        page_json = urlfetch.Fetch('http://www.reddit.com/r/'+page+'.json' )
+
+        print page,page_json.content
+        
+        obj = json.loads(  page_json.content )
+
+        #print(obj.get('data').get('children'))
         for subs in  obj.get('data').get('children'):
-
-            print subs['data']['title'], subs['data']
-
             if not subs['data']['url']:
               continue
-
+            
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
-            if not ext or ext == "gif":
+            print ext
+            if not ext or ext == ".gif":
               continue
 
+            title = subs['data']['title']
+            if title.find("NSFW") > 0:
+              print title, "Discarded"
+              continue
+            
+            tt = subs['data']['url'];
+            s = db.Query(RedditSubmissions)
+            s = RedditSubmissions.all();
+            r = s.filter('url =', tt).fetch(limit=1)
+            print title, tt, len(r)
+            if len(r) > 0:
+              print "Not added: ", tt
+              print "\n"
+              continue
+            
             try:
-                image = urlfetch.Fetch(subs['data']['url']).content
-                img = images.Image(image)
-                img.im_feeling_lucky()
-                png_data = img.execute_transforms(images.PNG)
-
-                RedditSubmissions(
-                    data= png_data,
-                    json = str(subs['data']),
-                    title = subs['data']['title'],
-                    url =subs['data']['url'],
-                    author = subs['data']['author'],
-                    score = int(subs['data']['score']),
-                    rand = random.random(),
+              image = urlfetch.Fetch(subs['data']['url']).content
+              img = images.Image(image)
+              img.im_feeling_lucky()
+              
+              if img.width > 2048 or img.height > 1600:
+                continue
+              
+                
+              if img.width > 1024 or img.height > 768:
+                img.resize(1024,768)
+                
+              png_data = img
+                
+              png_data = img.execute_transforms(images.PNG)
+                
+              temp = subs['data']['title']
+              temp = temp.replace("\"", "\'")
+              RedditSubmissions(
+                data= png_data,
+                width = img.width,
+                height = img.height,
+                json = str(subs['data']),
+                title = temp,
+                  url =subs['data']['url'],
+                author = subs['data']['author'],
+                score = int(subs['data']['score']),
+                rand = random.random(),
+                star = False,
                     ).put()
-
-                print "put"
-
+              
+              print "put"
+              
             except Exception,e:
-                print e
-
-        self.redirect('/')
-    
+              print e
+              
+            self.redirect('/')
+                
     #self.render_to_response('templatehtml/upload.html', {'subs': sub })
-
+    
 
 def main():
-  url_map = [('/update', FfUpdate),
+  url_map = [
+             ('/delete', FfDelete),
+             ('/new', FfNew),
+             ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
+             ('/upvote/([-\w]+)', FfUpVote),
+             ('/upvote2/([-\w]+)', FfUpVote2),
+             ('/update/([-\w]+)', FfUpdate),
              ('/', FfSlideshow)]
              
   application = webapp.WSGIApplication(url_map,debug=True)

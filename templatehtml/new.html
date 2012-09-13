@@ -16,6 +16,15 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
+	<style>
+	  .lbl { color:#fff; font-size:12px; font-weight:bold; position: absolute; top:0%; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+	  #lbl_left { text-align:center; width:0%; margin:auto;   display:table; }
+	  .g { color:#aaa }
+	  .c { color:#fa0 }
+	   a { color:red }
+	  
+	</style>
+
 	<script type="text/javascript">
 		if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
 			var addToHomeConfig = {
@@ -38,28 +47,44 @@
 </head>
 
 <body>
-	<div id="wrapper"></div>
-	
+	<div id="wrapper">
+  <div id="lbl_left" class="lbl">  redfunfetch   
+	</div>
+		<ul id="nav">
+		  <li id="next" onclick="upVote()">+</li>
+	</ul>
+
 <script type="text/javascript">
 
+function upVote(){
+
+	document.body.innerHTML += '<form id="dynForm" action="/upvote2/'+ slides[current].key +'" method="post" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
+	document.getElementById("dynForm").submit();
+alert("added");
+}
 
 var	gallery,
 	el,
 	i,
 	page,
+        current,
 	slides = [
 
 {% for s in subs %}
 		{
 			img: "image/{{ s.key }}",
+			key: "{{ s.key }}",
                         width: {{ s.width }},
                         height: {{ s.height }},
-			desc: "{{ s.title }}"
+			desc: "{{ s.title }}",
+                        star: "{{s.star}}"
 		},
 {% endfor %}
 	];
 
 gallery = new SwipeView('#wrapper', { numberOfPages: slides.length });
+
+current = 0;
 
 // Load initial data
 for (i=0; i<3; i++) {
@@ -116,7 +141,11 @@ gallery.onFlip(function () {
 	    el.innerHTML = slides[upcoming].desc;
 		}
 	}
-    
+      current = gallery.pageIndex;
+      el = document.getElementById('lbl_left');
+
+      el.innerHTML =  ' <span id="res" class="g">('+slides[current].width+','+slides[current].height+')</span>    <span id="star" class="c">'+slides[current].star+'</span> <span id="star" class="g">'+current+'</span>'
+
 });
 
 gallery.onMoveOut(function () {
