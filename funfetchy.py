@@ -40,36 +40,63 @@ class FfBaseHandler(webapp.RequestHandler):
     self.response.out.write(
         template.render(self.template_path(filename), template_args))
 
-
+#######################
+#Show eveything starred
+#######################
 class FfSlideshow(FfBaseHandler):
   def get(self):
-    submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all().filter('star =',True)
-    submissions.order('-created_date')
+    submissions = RedditSubmissions.all().filter('star =',True).order('-created_date').fetch(99)
     self.render_to_response('templatehtml/index.html', {
         'subs': submissions,
      })
 
+#######################
+#Show eveything in webgl
+#######################
 class FfPass(FfBaseHandler):
   def get(self):
-    submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all()
-    submissions.order('-created_date')
+    submissions = RedditSubmissions.all().order('-created_date').fetch(99)
     self.render_to_response('templatehtml/webgl.html', {
         'subs': submissions,
         'size': submissions.count(),
         'one': submissions[0]
      })
 
+#######################
+#Show eveything in html5
+#######################
 class FfNew(FfBaseHandler):
   def get(self):
-    submissions = db.Query(RedditSubmissions)
-    submissions = RedditSubmissions.all()
-    submissions.order('-created_date')
+    submissions = RedditSubmissions.all().order('-created_date').fetch(99)
     self.render_to_response('templatehtml/new.html', {
         'subs': submissions,
      })
 
+#######################
+#Show random in html5
+#######################
+class FfRandom(FfBaseHandler):
+  def get(self):
+    submissions = RedditSubmissions.all().filter('rand > ', random.random()).order('rand').fetch(99)
+    self.render_to_response('templatehtml/index.html', {
+        'subs': submissions,
+     })
+
+#######################
+#Delete cron job
+#######################
+class FfDelete(webapp.RequestHandler):
+  def get(self):
+        #DELETE ALL PREVIOUS POSTS
+        s = RedditSubmissions.all().order('-created_date').fetch(99);
+        for j in s:
+          if not j.star:
+            print j
+            j.delete()
+
+#######################
+#Set starred in html5
+#######################
 class FfUpVote2(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
@@ -79,7 +106,10 @@ class FfUpVote2(FfBaseHandler):
           sub.star = False
         sub.put()
         self.redirect('/new')
-     
+
+#######################
+#Set starred in webgl
+#######################     
 class FfUpVote(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
@@ -90,22 +120,20 @@ class FfUpVote(FfBaseHandler):
         sub.put()
         self.redirect('/webgl')
         
+#######################
+#Utility serve image
+#######################
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
         self.response.headers['Content-Type'] = 'image/gif'
         self.response.out.write(image.data)
 
-class FfDelete(webapp.RequestHandler):
-  def get(self):
-        #DELETE ALL PREVIOUS POSTS
-        s = db.Query(RedditSubmissions)
-        s = RedditSubmissions.all();
-        for j in s:
-          if not j.star:
-            j.delete()
 
-
+########################################
+#Grab images from the passed reddit page
+# i.e. <web>/update/(funny/wtf/etc)
+########################################
 class FfUpdate(webapp.RequestHandler):
     def get(self,page):
         
@@ -133,7 +161,6 @@ class FfUpdate(webapp.RequestHandler):
               continue
             
             tt = subs['data']['url'];
-            s = db.Query(RedditSubmissions)
             s = RedditSubmissions.all();
             r = s.filter('url =', tt).fetch(limit=1)
             print title, tt, len(r)
@@ -187,6 +214,7 @@ def main():
   url_map = [
              ('/delete', FfDelete),
              ('/new', FfNew),
+             ('/random', FfRandom),
              ('/webgl', FfPass),
              ('/image/([-\w]+)', FfServeImage),
              ('/upvote/([-\w]+)', FfUpVote),
