@@ -58,7 +58,7 @@ class FfPass(FfBaseHandler):
     submissions = RedditSubmissions.all().order('-created_date').fetch(99)
     self.render_to_response('templatehtml/webgl.html', {
         'subs': submissions,
-        'size': submissions.count(),
+        'size': len(submissions),
         'one': submissions[0]
      })
 
