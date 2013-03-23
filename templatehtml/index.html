@@ -17,24 +17,36 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 	<script type="text/javascript">
-		if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
-			var addToHomeConfig = {
-				animationIn:'bubble',		// Animation In
-				animationOut:'drop',		// Animation Out
-				lifespan:100000,				// The popup lives 10 seconds
-				expire:5,					// The popup is shown only once every 2 minutes
-				touchIcon:true,
-			    message:'<strong>%device</strong> says: you can add this app to your homescreen.'
-			};
-
-			document.write('<link rel="stylesheet" href="media//add2home.css">');
-			document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');
-		}
-	</script>
-
-	<title>redfunfetch</title>
-	<link href="media/style.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="media/swipeview.js"></script>
+	  if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
+	  var addToHomeConfig = {
+	  animationIn:'bubble',		// Animation In
+	  animationOut:'drop',		// Animation Out
+	  lifespan:100000,				// The popup lives 10 seconds
+	  expire:5,					// The popup is shown only once every 2 minutes
+	  touchIcon:true,
+	  message:'<strong>%device</strong> says: you can add this app to your homescreen.'
+	  };
+	  
+	  document.write('<link rel="stylesheet" href="media//add2home.css">');
+	  document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');
+	      }
+	  </script>
+	  
+	  <script type="text/javascript">
+	    var _gaq = _gaq || [];
+	    _gaq.push(['_setAccount', 'UA-27670030-1']);
+	    _gaq.push(['_trackPageview']);
+	    
+	    (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	    })();
+	  </script>
+	  	  
+	  <title>redfunfetch</title>
+	  <link href="media/style.css" rel="stylesheet" type="text/css">
+	  <script type="text/javascript" src="media/swipeview.js"></script>		
 </head>
 
 <body>
