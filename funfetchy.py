@@ -126,7 +126,7 @@ class FfUpVote(FfBaseHandler):
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
-        self.response.headers['Content-Type'] = 'image/gif'
+        self.response.headers['Content-Type'] = 'image/png'
         self.response.out.write(image.data)
 
 
