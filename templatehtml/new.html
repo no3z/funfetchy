@@ -7,8 +7,6 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-
-	<!-- Of course it is advisable to have touch icons ready for each device -->
 	<link rel="apple-touch-icon" href="media/touch-icon-iphone.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="media/touch-icon-ipad.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="media/touch-icon-iphone4.png">
@@ -18,50 +16,71 @@
 
 	<style>
 	  .lbl { color:#fff; font-size:12px; font-weight:bold; position: absolute; top:0%; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+	  .lbl2 { color:#fff; font-size:12px; font-weight:bold; position: absolute; top:50%;  z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
 	  #lbl_left { text-align:center; width:0%; margin:auto;   display:table; }
 	  .g { color:#aaa }
 	  .c { color:#fa0 }
 	   a { color:red }
-	  
 	</style>
 
 	<script type="text/javascript">
-		if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
-			var addToHomeConfig = {
-				animationIn:'bubble',		// Animation In
-				animationOut:'drop',		// Animation Out
-				lifespan:100000,				// The popup lives 10 seconds
-				expire:5,					// The popup is shown only once every 2 minutes
-				touchIcon:true,
-			    message:'<strong>%device</strong> says: you can add this app to your homescreen.'
-			};
+	  if ('standalone' in navigator && !navigator.standalone && (/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion)) {
+	  var addToHomeConfig = {
+	  animationIn:'bubble',		// Animation In
+	  animationOut:'drop',		// Animation Out
+	  lifespan:100000,				// The popup lives 10 seconds
+	  expire:5,					// The popup is shown only once every 2 minutes
+	  touchIcon:true,
+	  message:'<strong>%device</strong> says: you can add this app to your homescreen.'
+	  };
+	  
+	  document.write('<link rel="stylesheet" href="media//add2home.css">');
+	  document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');}
+	  </script>
+	  
+	  <title>redfunfetch</title>
+	  <link href="media/style.css" rel="stylesheet" type="text/css">
+	  <script type="text/javascript" src="media/swipeview.js"></script>
 
-			document.write('<link rel="stylesheet" href="media//add2home.css">');
-			document.write('<script type="application\/javascript" src="media/add2home.js" charset="utf-8"><\/s' + 'cript>');
-		}
-	</script>
+	  <script type="text/javascript">
+	    var _gaq = _gaq || [];
+	    _gaq.push(['_setAccount', 'UA-27670030-1']);
+	    _gaq.push(['_trackPageview']);
+	    
+	    (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	    })();
 
-	<title>redfunfetch</title>
-	<link href="media/style.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="media/swipeview.js"></script>
+</script>
+
 </head>
 
 <body>
-	<div id="wrapper">
-  <div id="lbl_left" class="lbl">  redfunfetch   
-	</div>
-		<ul id="nav">
-		  <li id="next" onclick="upVote()">+</li>
-	</ul>
+  <div id="wrapper">
+    <div id="lbl_left" class="lbl" >redfunfetch</div>
+    <div class="lbl2" onclick="saveImage()">Save </div> 
+  <ul id="nav">
+    <li id="next" onclick="upVote()">+</li>
+  </ul>
 
 <script type="text/javascript">
 
-function upVote(){
-
-	document.body.innerHTML += '<form id="dynForm" action="/upvote2/'+ slides[current].key +'" method="post" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
-	document.getElementById("dynForm").submit();
-alert("added");
+function saveImage()
+{
+ document.body.innerHTML += '<form id="dynForm" action="/image/'+ slides[current].key +'" method="get" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
+ document.getElementById("dynForm").submit();
 }
+
+
+function upVote(){
+ document.body.innerHTML += '<form id="dynForm" action="/upvote2/'+ slides[current].key +'" method="post" enctype="multipart/form-data"><input type="hidden" name="q" value="a"></form>';
+ document.getElementById("dynForm").submit();
+ Alert("added");
+}
+
+
 
 var	gallery,
 	el,
