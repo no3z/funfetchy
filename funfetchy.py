@@ -162,8 +162,9 @@ class FfUpdate(webapp.RequestHandler):
             tt = subs['data']['url'];
             s = RedditSubmissions.all();
             r = s.filter('url =', tt).fetch(limit=1)
-            print "<p>", title.encode('utf-8'), tt.encode('utf-8'), "Bad lenght. </p>"
+           
             if len(r) > 0:
+	      print "<p>", title.encode('utf-8'), tt.encode('utf-8'), "Already inserted. </p>"
               continue
             
 
