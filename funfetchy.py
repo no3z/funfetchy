@@ -139,7 +139,7 @@ class FfUpdate(webapp.RequestHandler):
         
         page_json = urlfetch.Fetch('http://www.reddit.com/r/'+page+'.json' )
 
-        print page,page_json.content
+        #print page,page_json.content
         
         obj = json.loads(  page_json.content )
 
@@ -151,23 +151,22 @@ class FfUpdate(webapp.RequestHandler):
             path = urlparse.urlparse(subs['data']['url']).path
             ext = os.path.splitext(path)[1]
 
-            print ext
             if not ext or ext == ".gif":
               continue
 
             title = subs['data']['title']
             if title.find("NSFW") > 0:
-              print title, "Discarded"
+	      print "<p>", title.encode('utf-8'), "discarded because NSFW.. </p>"              
               continue
             
             tt = subs['data']['url'];
             s = RedditSubmissions.all();
             r = s.filter('url =', tt).fetch(limit=1)
-            print title, tt, len(r)
+            print "<p>", title.encode('utf-8'), tt.encode('utf-8'), "Bad lenght. </p>"
             if len(r) > 0:
-              print "Not added: ", tt
-              print "\n"
               continue
+            
+
             
             try:
               image = urlfetch.Fetch(subs['data']['url']).content
@@ -200,7 +199,7 @@ class FfUpdate(webapp.RequestHandler):
                 star = False,
                     ).put()
               
-              print "put"
+	      print "<p>", title.encode('utf-8'), tt.encode('utf-8'), len(r), ext.encode('utf-8'), "inserted! </p>"
               
             except Exception,e:
               print e
