@@ -179,7 +179,7 @@ class FfUpdate(webapp.RequestHandler):
               
                 
               if img.width > 1024 or img.height > 768:
-                img.resize(1024,768)
+                img.resize(img.width/2,img.height/2)
                 
               png_data = img
                 
