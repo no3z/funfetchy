@@ -6,11 +6,14 @@ api_version: 1
 
 handlers:
 - url: /media
-  static_dir: media
+  static_dir: media     
 
-
-- url: /.*
+- url: /(delete|upvote/.*|upvote2/.*|update/.*)
   script: funfetchy.py
+  login: admin
+  
+- url: /.*
+  script: funfetchy.py 
   
 - url: /stylesheets
   static_dir: stylesheets

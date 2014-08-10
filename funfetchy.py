@@ -1,22 +1,21 @@
-from __future__ import with_statement
-from google.appengine.api import files
-
-import os
-
-from google.appengine.dist import use_library
-use_library('django', '0.96')
-
+from google.appengine.api import users
 from google.appengine.api import images
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
-from django.utils import simplejson as json
 
-
+import json 
+import os
+import cgi 
 import wsgiref.handlers
 import random
 import urlparse
+
+
+
+#RedditSubmissions data model
+##############################################
 
 class RedditSubmissions(db.Model):
   created_date = db.DateTimeProperty(auto_now_add=True)
@@ -31,18 +30,21 @@ class RedditSubmissions(db.Model):
   rand = db.FloatProperty()
   star = db.BooleanProperty()
 
+#Request handler
+##############################################
+
 class FfBaseHandler(webapp.RequestHandler):
   def template_path(self, filename):
     return os.path.join(os.path.dirname(__file__), filename)
 
   def render_to_response(self, filename, template_args):
     template_args.setdefault('current_uri', self.request.uri)
-    self.response.out.write(
-        template.render(self.template_path(filename), template_args))
+    self.response.out.write(str(
+        template.render(self.template_path(filename), template_args)))
 
-#######################
+
 #Show eveything starred
-#######################
+##############################################
 class FfSlideshow(FfBaseHandler):
   def get(self):
     submissions = RedditSubmissions.all().filter('star =',True).order('-created_date').fetch(99)
@@ -50,9 +52,8 @@ class FfSlideshow(FfBaseHandler):
         'subs': submissions,
      })
 
-#######################
 #Show eveything in webgl
-#######################
+##############################################
 class FfPass(FfBaseHandler):
   def get(self):
     submissions = RedditSubmissions.all().order('-created_date').fetch(99)
@@ -62,9 +63,8 @@ class FfPass(FfBaseHandler):
         'one': submissions[0]
      })
 
-#######################
 #Show eveything in html5
-#######################
+##############################################
 class FfNew(FfBaseHandler):
   def get(self):
     submissions = RedditSubmissions.all().order('-created_date').fetch(99)
@@ -72,9 +72,9 @@ class FfNew(FfBaseHandler):
         'subs': submissions,
      })
 
-#######################
+
 #Show random in html5
-#######################
+##############################################
 class FfRandom(FfBaseHandler):
   def get(self):
     submissions = RedditSubmissions.all().filter('rand > ', random.random()).order('rand').fetch(99)
@@ -82,9 +82,9 @@ class FfRandom(FfBaseHandler):
         'subs': submissions,
      })
 
-#######################
+
 #Delete cron job
-#######################
+##############################################
 class FfDelete(webapp.RequestHandler):
   def get(self):
         #DELETE ALL PREVIOUS POSTS
@@ -94,9 +94,9 @@ class FfDelete(webapp.RequestHandler):
             print j
             j.delete()
 
-#######################
+
 #Set starred in html5
-#######################
+##############################################
 class FfUpVote2(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
@@ -107,9 +107,9 @@ class FfUpVote2(FfBaseHandler):
         sub.put()
         self.redirect('/new')
 
-#######################
+
 #Set starred in webgl
-#######################     
+##############################################
 class FfUpVote(FfBaseHandler):
     def post(self,pic_key):
         sub = db.get(pic_key)
@@ -120,20 +120,18 @@ class FfUpVote(FfBaseHandler):
         sub.put()
         self.redirect('/webgl')
         
-#######################
 #Utility serve image
-#######################
+##############################################
 class FfServeImage(webapp.RequestHandler):
     def get(self,pic_key):
         image = db.get(pic_key)
         self.response.headers['Content-Type'] = 'image/png'
-        self.response.out.write(image.data)
+        self.response.out.write(str(image.data))
 
 
-########################################
 #Grab images from the passed reddit page
 # i.e. <web>/update/(funny/wtf/etc)
-########################################
+##############################################
 class FfUpdate(webapp.RequestHandler):
     def get(self,page):
         
@@ -210,6 +208,10 @@ class FfUpdate(webapp.RequestHandler):
     #self.render_to_response('templatehtml/upload.html', {'subs': sub })
     
 
+
+##############################################
+# URL MAP DEFINITION
+##############################################
 def main():
   url_map = [
              ('/delete', FfDelete),
