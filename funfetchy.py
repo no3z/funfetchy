@@ -1,13 +1,19 @@
-from google.appengine.api import users
+from __future__ import with_statement
+from google.appengine.api import files
+
+import os
+
+from google.appengine.dist import use_library
+use_library('django', '0.96')
+
 from google.appengine.api import images
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
+from django.utils import simplejson as json
 
-import json 
-import os
-import cgi 
+
 import wsgiref.handlers
 import random
 import urlparse
