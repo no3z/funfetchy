@@ -2,6 +2,7 @@ import os
 import json
 import random
 import urlparse
+import unicodedata
 
 import webapp2 as webapp
 
@@ -57,7 +58,7 @@ class FfPass(FfBaseHandler):
     self.render_to_response('templatehtml/webgl.html', {
         'subs': submissions,
         'size': len(submissions),
-        'one': submissions[0]
+        'one': submissions[0],
      })
 
 #Show eveything in html5
@@ -162,8 +163,6 @@ class FfUpdate(webapp.RequestHandler):
 	      print "<p>", title.encode('utf-8'), tt.encode('utf-8'), "Already inserted. </p>"
               continue
             
-
-            
             try:
               image = urlfetch.Fetch(subs['data']['url']).content
               img = images.Image(image)
@@ -182,14 +181,15 @@ class FfUpdate(webapp.RequestHandler):
                 
               temp = subs['data']['title']
               temp = temp.replace("\"", "\'")
-              RedditSubmissions(
+              temp = unicodedata.normalize('NFKD', temp).encode('ascii','ignore')
+	      RedditSubmissions(
                 data= png_data,
                 width = img.width,
                 height = img.height,
-                json = str(subs['data']),
+                json = "",
                 title = temp,
-                  url =subs['data']['url'],
-                author = subs['data']['author'],
+                url = unicodedata.normalize('NFKD', subs['data']['url']).encode('ascii','ignore'),
+                author = unicodedata.normalize('NFKD', subs['data']['author']).encode('ascii','ignore'),
                 score = int(subs['data']['score']),
                 rand = random.random(),
                 star = False,
