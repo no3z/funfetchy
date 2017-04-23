@@ -1,23 +1,14 @@
-from __future__ import with_statement
-from google.appengine.api import files
-
 import os
-
-from google.appengine.dist import use_library
-use_library('django', '0.96')
-
-from google.appengine.api import images
-from google.appengine.ext import db
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.api import urlfetch
-from django.utils import simplejson as json
-
-
-import wsgiref.handlers
+import json
 import random
 import urlparse
 
+import webapp2 as webapp
+
+from google.appengine.api import images
+from google.appengine.ext import db
+from google.appengine.ext.webapp import template
+from google.appengine.api import urlfetch
 
 
 #RedditSubmissions data model
@@ -218,8 +209,7 @@ class FfUpdate(webapp.RequestHandler):
 ##############################################
 # URL MAP DEFINITION
 ##############################################
-def main():
-  url_map = [
+url_map = [
              ('/delete', FfDelete),
              ('/new', FfNew),
              ('/random', FfRandom),
@@ -230,8 +220,4 @@ def main():
              ('/update/([-\w]+)', FfUpdate),
              ('/', FfSlideshow)]
              
-  application = webapp.WSGIApplication(url_map,debug=True)
-  wsgiref.handlers.CGIHandler().run(application)
-
-if __name__ == '__main__':
-  main()
+application = webapp.WSGIApplication(url_map,debug=True)

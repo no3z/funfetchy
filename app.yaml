@@ -1,19 +1,19 @@
 application: funfetchy
 version: 1
-runtime: python
+runtime: python27
 api_version: 1
-
+threadsafe: yes
 
 handlers:
 - url: /media
   static_dir: media     
 
 - url: /(delete|upvote/.*|upvote2/.*|update/.*)
-  script: funfetchy.py
+  script: funfetchy.application
   login: admin
   
 - url: /.*
-  script: funfetchy.py 
+  script: funfetchy.application
   
 - url: /stylesheets
   static_dir: stylesheets
